@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پلتفرم هوشمند تحلیل داده | صدراافزار</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet"> -->
+    <link href="/static/css/cdn.css" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: "BRoya";
+            src: url("/static/fonts/B Roya_0.ttf") format('truetype');
+        }
+        @font-face {
+            font-family: "BNazanin";
+            src: url("/static/fonts/B Nazanin Bold_0") format('truetype');
+        }
+
+        :root {
+            --primary: #1a5f2a;
+            --primary-light: #2e8b45;
+            --primary-dark: #0d3d17;
+            --secondary: #f4a261;
+            --bg-main: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --bg-chat: #ffffff;
+            --bg-user: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            --bg-bot: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            --text-primary: #1a1a2e;
+            --text-secondary: #546e7a;
+            --border: #e0e0e0;
+            --shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --radius: 16px;
+            --excel-primary: #217346;
+            --excel-primary-dark: #1a5c38;
+            --doc-primary: #1565c0;
+            --doc-primary-dark: #0d47a1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+                        font-family: "Vazirmatn" !important;
+
+        }
+
+        html,body {
+            font-family: "Vazirmatn" !important;
+            background: var(--bg-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(46, 139, 69, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(244, 162, 97, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(26, 95, 42, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #fff 0%, #24520f 100%);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .header-text h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .header-text p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        /* Back Button */
+        .back-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .back-btn.visible {
+            display: flex;
+        }
+
+        /* Token Display */
+        .token-display {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 10px 16px;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .token-label {
+            font-size: 0.7rem;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .token-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-family: 'Vazirmatn', monospace;
+        }
+
+        .token-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .token-bar-fill {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        /* Module Selection Screen */
+        .module-selection {
+            padding: 40px 30px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .selection-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .selection-title {
+            font-size: 1.6rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .selection-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .module-card:hover::before {
+            opacity: 1;
+        }
+
+        .module-card.documents::before {
+            background: linear-gradient(90deg, var(--doc-primary), var(--doc-primary-dark));
+        }
+
+        .module-card.excel::before {
+            background: linear-gradient(90deg, var(--excel-primary), var(--excel-primary-dark));
+        }
+
+        .module-card.documents:hover {
+            border-color: rgba(21, 101, 192, 0.2);
+        }
+
+        .module-card.excel:hover {
+            border-color: rgba(33, 115, 70, 0.2);
+        }
+
+        .module-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            position: relative;
+        }
+
+        .module-card.documents .module-icon {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: var(--doc-primary);
+        }
+
+        .module-card.excel .module-icon {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: var(--excel-primary);
+        }
+
+        .module-icon .icon-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            filter: blur(20px);
+        }
+
+        .module-card.documents .icon-glow {
+            background: rgba(21, 101, 192, 0.3);
+        }
+
+        .module-card.excel .icon-glow {
+            background: rgba(33, 115, 70, 0.3);
+        }
+
+        .module-card:hover .icon-glow {
+            opacity: 0.6;
+        }
+
+        .module-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .module-card.documents .module-name {
+            color: var(--doc-primary-dark);
+        }
+
+        .module-card.excel .module-name {
+            color: var(--excel-primary-dark);
+        }
+
+        .module-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .module-features {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: right;
+        }
+
+        .module-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 6px 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .module-feature::before {
+            content: '✓';
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .module-card.documents .module-feature::before {
+            color: var(--doc-primary);
+        }
+
+        .module-card.excel .module-feature::before {
+            color: var(--excel-primary);
+        }
+
+        .module-select-btn {
+            margin-top: 24px;
+            padding: 12px 32px;
+            border-radius: 25px;
+            border: none;
+            color: white;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .module-card.documents .module-select-btn {
+            background: linear-gradient(135deg, var(--doc-primary) 0%, var(--doc-primary-dark) 100%);
+        }
+
+        .module-card.excel .module-select-btn {
+            background: linear-gradient(135deg, var(--excel-primary) 0%, var(--excel-primary-dark) 100%);
+        }
+
+        .module-select-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Active Module Indicator */
+        .active-module-badge {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-right: 10px;
+        }
+
+        .active-module-badge.visible {
+            display: flex;
+        }
+
+        /* Welcome Message */
+        .welcome-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            display: none;
+        }
+
+        .welcome-section.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .welcome-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .welcome-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .welcome-features {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .feature-badge {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Chat Area */
+        #chat {
+            height: 420px;
+            overflow-y: auto;
+            background: var(--bg-chat);
+            padding: 20px;
+            scroll-behavior: smooth;
+            display: none;
+        }
+
+        #chat.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            border-radius: var(--radius);
+            line-height: 1.9;
+            word-wrap: break-word;
+            animation: fadeIn 0.4s ease;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            background: var(--bg-user);
+            margin-right: auto;
+            border-bottom-right-radius: 4px;
+            border: 1px solid #bbdefb;
+        }
+
+        .message.bot {
+            background: var(--bg-bot);
+            margin-left: auto;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .message .role {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .message.user .role { color: #1565c0; }
+        .message.bot .role { color: var(--primary); }
+
+        .message .role::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .message-content {
+            font-size: 0.95rem;
+        }
+
+        /* Editable message */
+        .message.user .message-content {
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .message.user .message-content:hover {
+            background: rgba(21, 101, 192, 0.1);
+        }
+
+        .message.user .edit-btn {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background: none;
+            border: none;
+            color: #1565c0;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .message.user:hover .edit-btn {
+            opacity: 1;
+        }
+
+        /* Edit Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal h3 {
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+
+        .modal textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .modal-buttons .cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .modal-buttons .submit {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Sources */
+        .sources {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border);
+            font-size: 0.8rem;
+        }
+
+        .sources-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sources ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sources li {
+            background: rgba(46, 139, 69, 0.08);
+            padding: 6px 12px;
+            margin: 4px 0;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: none;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-area.active {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #question {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+        }
+
+        #question:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        #question::placeholder {
+            color: #9e9e9e;
+        }
+
+        #sendBtn {
+            padding: 14px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        #sendBtn:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 95, 42, 0.3);
+        }
+
+        #sendBtn:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loader */
+        .loader {
+            text-align: center;
+            padding: 12px;
+            color: var(--primary);
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .loader-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .token-calc-animation {
+            margin-bottom: 10px;
+            padding: 12px;
+            background: rgba(26, 95, 42, 0.1);
+            border-radius: 8px;
+        }
+
+        .token-calc-text {
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .token-calc-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .token-calc-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .token-calc-detail {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Token Warning */
+        .token-warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 16px;
+            text-align: center;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .token-warning.active {
+            display: block;
+        }
+
+        .token-warning.low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Scrollbar */
+        #chat::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chat::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        /* Divider between modules */
+        .modules-divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .modules-divider::before,
+        .modules-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { border-radius: 12px; }
+            .header { 
+                flex-direction: column; 
+                gap: 12px;
+                text-align: center;
+            }
+            .header-right {
+                flex-direction: column;
+            }
+            .header-left {
+                flex-direction: column;
+            }
+            .header-text h1 { font-size: 1.1rem; }
+            
+            .modules-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .module-selection {
+                padding: 30px 20px;
+                min-height: auto;
+            }
+            
+            .selection-title {
+                font-size: 1.3rem;
+            }
+            
+            #chat { height: 350px; padding: 12px; }
+            .message { max-width: 92%; }
+            .input-area { 
+                padding: 12px; 
+                flex-direction: column;
+            }
+            #question, #sendBtn { width: 100%; }
+            .welcome-features { gap: 10px; }
+            .feature-badge { padding: 6px 12px; font-size: 0.75rem; }
+            
+            .back-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .module-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-right">
+                <div class="logo">
+                    <img src="../static/fonts/logo-mobile-light.png.jpeg" width="32" height="32" alt="logo">
+                </div>
+                <div class="header-text">
+                    <h1 id="headerTitle">پلتفرم هوشمند تحلیل داده</h1>
+                    <p id="headerSubtitle">صدراافزار | سیستم پاسخگویی چندمنظوره</p>
+                </div>
+                <div class="active-module-badge" id="activeModuleBadge">
+                    <span id="activeModuleIcon">📄</span>
+                    <span id="activeModuleName">مستندات نارگان</span>
+                </div>
+            </div>
+            <div class="header-left">
+                <button class="back-btn" id="backBtn" onclick="goBackToSelection()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <span>بازگشت به انتخاب</span>
+                </button>
+                <div class="token-display" id="tokenDisplay" style="display: none;">
+                    <div class="token-label">اعتبار شما</div>
+                    <div class="token-value" id="tokenValue">۱۰۰۰۰</div>
+                    <div class="token-bar">
+                        <div class="token-bar-fill" id="tokenBar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="token-warning" id="tokenWarning">
+            ⚠️ اعتبار شما کم است. لطفاً با پشتیبانی تماس بگیرید.
+        </div>
+
+        <!-- Module Selection Screen -->
+        <div class="module-selection" id="moduleSelection">
+            <div class="selection-header">
+                <div class="selection-title">به پلتفرم هوشمند صدراافزار خوش آمدید</div>
+                <div class="selection-subtitle">لطفاً حوزه مورد نظر خود را برای تحلیل و پرسش انتخاب کنید</div>
+            </div>
+
+            <div class="modules-grid">
+                <!-- Documents Module -->
+                <div class="module-card documents" onclick="selectModule('documents')">
+                    <div class="module-icon">
+                        <div class="icon-glow"></div>
+                        <span>📋</span>
+                    </div>
+                    <div class="module-name">مستندات استاندارد نارگان</div>
+                    <div class="module-desc">
+                        تحلیل و پاسخگویی هوشمند بر اساس مستندات فنی، استانداردها و دستورالعمل‌های شرکتی نارگان
+                    </div>
+                    <div class="module-features">
+                        <div class="module-feature">بررسی استانداردهای فنی و مهندسی</div>
+                        <div class="module-feature">راهنمایی پروژه‌های در دست اجرا</div>
+                        <div class="module-feature">مستندات تعمیرات و نگهداری قطعات</div>
+                        <div class="module-feature">مستندات قراردادها و تعهدات</div>
+                    </div>
+                    <button class="module-select-btn">ورود به ماژول</button>
+                </div>
+
+                <!-- Excel Module -->
+                <div class="module-card excel" onclick="selectModule('excel')">
+                    <div class="module-icon">
+                        <div class="icon-glow"></div>
+                        <span>📊</span>
+                    </div>
+                    <div class="module-name">تحلیلگر فایل‌های اکسل</div>
+                    <div class="module-desc">
+                        پرسش و تحلیل هوشمند داده‌ها، گزارش‌ها و شیت‌های اکسل با قابلیت پردازش اعداد و نمودارها
+                    </div>
+                    <div class="module-features">
+                        <div class="module-feature">تحلیل داده‌های عددی و آماری</div>
+                        <div class="module-feature">استخراج گزارشات از شیت‌ها</div>
+                        <div class="module-feature">مقایسه و تطبیق داده‌ها</div>
+                        <div class="module-feature">محاسبات و فرمول‌های پیچیده</div>
+                    </div>
+                    <button class="module-select-btn">ورود به ماژول</button>
+                </div>
+            </div>
+
+            <div class="modules-divider">یا</div>
+            
+            <div style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 10px;">
+                هر دو سیستم بر پایه هوش مصنوعی و با پشتیبانی از زبان فارسی فعالیت می‌کنند
+            </div>
+        </div>
+
+        <!-- Welcome Section (Dynamic) -->
+        <div class="welcome-section" id="welcomeSection">
+            <div class="welcome-icon" id="welcomeIcon">🤖</div>
+            <div class="welcome-title" id="welcomeTitle">به تحلیلگر هوشمند خوش آمدید!</div>
+            <div class="welcome-text" id="welcomeText">
+                من می‌توانم به شما در موارد زیر کمک کنم:
+            </div>
+            <div class="welcome-features" id="welcomeFeatures">
+                <span class="feature-badge">📋 بررسی مستندات فنی</span>
+                <span class="feature-badge">🔧 پاسخ به سؤالات مهندسی</span>
+                <span class="feature-badge">⚙️ بررسی و پاسخ به تعمیرات/span>
+                <span class="feature-badge">💡 راهنمایی پروژه‌ها</span>
+            </div>
+        </div>
+
+        <div id="chat"></div>
+
+        <div class="loader" id="loader">
+            <span class="loader-spinner"></span>
+            <div class="token-calc-animation">
+                <div class="token-calc-text">در حال محاسبه توکن‌ها...</div>
+                <div class="token-calc-bar">
+                    <div class="token-calc-progress" id="tokenCalcProgress"></div>
+                </div>
+                <div class="token-calc-detail" id="tokenCalcDetail">تخمین: ۰ توکن</div>
+            </div>
+            <span class="loader-spinner"></span>
+        </div>
+
+        <div class="input-area" id="inputArea">
+            <textarea 
+                id="question" 
+                placeholder="سؤال خود را بنویسید..." 
+                rows="1"
+                onkeydown="handleKeyDown(event)"
+            ></textarea>
+            <button onclick="sendMsg()" id="sendBtn">
+                <span>ارسال</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h3>✏️ ویرایش سؤال</h3>
+            <textarea id="editText" rows="4"></textarea>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeModal()">انصراف</button>
+                <button class="submit" onclick="submitEdit()">ارسال مجدد</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Session management
+        const SESSION_ID = "chat_" + Math.random().toString(36).substr(2, 9);
+        let currentToken = 10000;
+        let maxToken = 10000;
+        let editingMessageId = null;
+        let currentModule = null;
+
+        // Module configurations
+        const moduleConfig = {
+            documents: {
+                title: 'تحلیلگر هوشمند مستندات نارگان',
+                subtitle: 'صدراافزار | پاسخگویی هوشمند بر اساس مستندات فنی',
+                headerColor: 'linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)',
+                welcomeIcon: '🤖',
+                welcomeTitle: 'به تحلیلگر هوشمند نارگان خوش آمدید!',
+                welcomeFeatures: [
+                    '📋 بررسی مستندات فنی',
+                    '🔧 پاسخ به سؤالات مهندسی',
+                    '⚙️ بررسی و پاسخ به تعمیرات',
+                    '💡 راهنمایی پروژه‌ها'
+                ],
+                apiEndpoint: '/api/ask/documents',
+                tokenEndpoint: '/api/token/status/documents',
+                placeholder: 'سؤال خود را درباره مستندات نارگان بنویسید...'
+            },
+            excel: {
+                title: 'تحلیلگر هوشمند اکسل',
+                subtitle: 'صدراافزار | پردازش و تحلیل فایل‌های داده‌ای',
+                headerColor: 'linear-gradient(135deg, #217346 0%, #1a5c38 100%)',
+                welcomeIcon: '📈',
+                welcomeTitle: 'به تحلیلگر هوشمند اکسل خوش آمدید!',
+                welcomeFeatures: [
+                    '📊 تحلیل داده‌های عددی',
+                    '📉 استخراج گزارشات',
+                    '🔍 مقایسه و تطبیق داده‌ها',
+                    '🧮 محاسبات پیشرفته'
+                ],
+                apiEndpoint: '/api/ask/excel',
+                tokenEndpoint: '/api/token/status/excel',
+                placeholder: 'سؤال خود را درباره فایل‌های اکسل بنویسید...'
+            }
+        };
+
+        // Convert to Persian numbers
+        function toPersianNum(num) {
+            const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            return String(num).replace(/[0-9]/g, d => persianDigits[d]);
+        }
+
+        // Update token display
+        function updateTokenDisplay(tokens) {
+            currentToken = tokens;
+            const percentage = (tokens / maxToken) * 100;
+            
+            document.getElementById('tokenValue').textContent = toPersianNum(tokens);
+            document.getElementById('tokenBar').style.width = percentage + '%';
+            
+            const warning = document.getElementById('tokenWarning');
+            if (tokens < 1000) {
+                warning.classList.add('active', 'low');
+                warning.textContent = '⚠️ اعتبار شما بسیار کم است! لطفاً تماس بگیرید.';
+            } else if (tokens < 3000) {
+                warning.classList.add('active');
+                warning.classList.remove('low');
+                warning.textContent = '⚠️ اعتبار شما در حال اتمام است.';
+            } else {
+                warning.classList.remove('active', 'low');
+            }
+        }
+
+        // Select module
+        function selectModule(moduleType) {
+            currentModule = moduleType;
+            const config = moduleConfig[moduleType];
+            
+            // Update header
+            document.getElementById('headerTitle').textContent = config.title;
+            document.getElementById('headerSubtitle').textContent = config.subtitle;
+            document.querySelector('.header').style.background = config.headerColor;
+            
+            // Show active badge
+            document.getElementById('activeModuleIcon').textContent = config.icon;
+            document.getElementById('activeModuleName').textContent = config.badge;
+            document.getElementById('activeModuleBadge').classList.add('visible');
+            
+            // Show back button and token
+            document.getElementById('backBtn').classList.add('visible');
+            document.getElementById('tokenDisplay').style.display = 'block';
+            
+            // Hide module selection
+            document.getElementById('moduleSelection').style.display = 'none';
+            
+            // Update welcome section
+            document.getElementById('welcomeIcon').textContent = config.welcomeIcon;
+            document.getElementById('welcomeTitle').textContent = config.welcomeTitle;
+            document.getElementById('welcomeTitle').style.color = moduleType === 'excel' ? '#217346' : '#1565c0';
+            
+            const featuresContainer = document.getElementById('welcomeFeatures');
+            featuresContainer.innerHTML = config.welcomeFeatures.map(f => 
+                `<span class="feature-badge">${f}</span>`
+            ).join('');
+            
+            // Update placeholder
+            document.getElementById('question').placeholder = config.placeholder;
+            
+            // Show chat interface elements
+            document.getElementById('welcomeSection').classList.add('active');
+            document.getElementById('chat').classList.add('active');
+            document.getElementById('inputArea').classList.add('active');
+            
+            // Initialize token for this module
+            initModuleTokens();
+        }
+
+        // Go back to selection
+        function goBackToSelection() {
+            // Reset all views
+            document.getElementById('moduleSelection').style.display = 'flex';
+            document.getElementById('welcomeSection').classList.remove('active');
+            document.getElementById('chat').classList.remove('active');
+            document.getElementById('inputArea').classList.remove('active');
+            document.getElementById('backBtn').classList.remove('visible');
+            document.getElementById('tokenDisplay').style.display = 'none';
+            document.getElementById('activeModuleBadge').classList.remove('visible');
+            document.getElementById('tokenWarning').classList.remove('active', 'low');
+            
+            // Reset header to default
+            document.getElementById('headerTitle').textContent = 'پلتفرم هوشمند تحلیل داده';
+            document.getElementById('headerSubtitle').textContent = 'صدراافزار | سیستم پاسخگویی چندمنظوره';
+            document.querySelector('.header').style.background = 'linear-gradient(135deg, #fff 0%, #24520f 100%)';
+            
+            // Clear chat
+            document.getElementById('chat').innerHTML = '';
+            
+            currentModule = null;
+        }
+
+        // Handle Enter key
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMsg();
+            }
+        }
+
+        // Auto-resize textarea
+        const textarea = document.getElementById('question');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Send message
+        async function sendMsg() {
+            const input = document.getElementById('question');
+            const btn = document.getElementById('sendBtn');
+            const loader = document.getElementById('loader');
+            const tokenCalcProgress = document.getElementById('tokenCalcProgress');
+            const tokenCalcDetail = document.getElementById('tokenCalcDetail');
+            
+            let q = input.value.trim();
+            if (!q || !currentModule) return;
+
+            // Hide welcome section
+            document.getElementById('welcomeSection').classList.remove('active');
+
+            // Add user message
+            addMessage(q, 'user');
+            input.value = '';
+            textarea.style.height = 'auto';
+
+            // Show loading with token animation
+            btn.disabled = true;
+            loader.classList.add('active');
+            
+            // Start token animation
+            let estimatedTokens = Math.max(100, Math.floor(q.length / 4) + 500);
+            let currentProgress = 0;
+            
+            const animationInterval = setInterval(() => {
+                currentProgress += Math.random() * 15;
+                if (currentProgress > 85) currentProgress = 85;
+                tokenCalcProgress.style.width = currentProgress + '%';
+                tokenCalcDetail.textContent = `تخمین: ${toPersianNum(Math.floor(estimatedTokens * currentProgress / 100))} توکن`;
+            }, 200);
+
+            try {
+                const config = moduleConfig[currentModule];
+                const res = await fetch(`${config.apiEndpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question: q,
+                        chat_id: SESSION_ID + '_' + currentModule
+                    })
+                });
+
+                const data = await res.json();
+                
+                // Complete animation
+                clearInterval(animationInterval);
+                tokenCalcProgress.style.width = '100%';
+                tokenCalcDetail.textContent = `محاسبه شد: ${toPersianNum(data.tokens_used || 0)} توکن`;
+                
+                await new Promise(r => setTimeout(r, 500));
+                
+                if (data.error) {
+                    addMessage(data.error, 'bot');
+                } else if (data.answer) {
+                    addMessage(data.answer, 'bot', data.sources);
+                    
+                    if (data.remaining_tokens !== undefined) {
+                        animateTokenDeduction(data.tokens_used || 0, data.remaining_tokens);
+                    }
+                }
+            } catch (e) {
+                clearInterval(animationInterval);
+                addMessage('خطا در ارتباط با سرور', 'bot');
+            }
+
+            btn.disabled = false;
+            loader.classList.remove('active');
+            tokenCalcProgress.style.width = '0%';
+        }
+
+        // Animate token deduction
+        function animateTokenDeduction(tokensUsed, newBalance) {
+            const tokenValue = document.getElementById('tokenValue');
+            const tokenBar = document.getElementById('tokenBar');
+            
+            let currentValue = currentToken;
+            const decrementPerStep = tokensUsed / 30;
+            
+            const interval = setInterval(() => {
+                currentValue -= decrementPerStep;
+                if (currentValue <= newBalance) {
+                    currentValue = newBalance;
+                    clearInterval(interval);
+                }
+                
+                tokenValue.textContent = toPersianNum(Math.floor(currentValue));
+                const percentage = (currentValue / maxToken) * 100;
+                tokenBar.style.width = percentage + '%';
+                
+                if (percentage < 30) {
+                    tokenBar.style.background = '#e53935';
+                } else if (percentage < 50) {
+                    tokenBar.style.background = '#ff9800';
+                } else {
+                    tokenBar.style.background = 'var(--secondary)';
+                }
+            }, 30);
+            
+            currentToken = newBalance;
+        }
+
+        // Add message to chat
+        function addMessage(text, type, sources = null) {
+            const chat = document.getElementById('chat');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            
+            const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            div.id = msgId;
+
+            const roleLabel = type === 'user' ? 'شما' : 'تحلیلگر';
+            
+            let html = `<div class="role">${roleLabel}</div>`;
+            
+            if (type === 'user') {
+                html += `
+                    <div class="message-content" onclick="openEditModal('${msgId}', this.textContent)">${text}</div>
+                    <button class="edit-btn" onclick="openEditModal('${msgId}', '${text.replace(/'/g, "\\'")}')">✏️</button>
+                `;
+            } else {
+                html += `<div class="message-content">${text}</div>`;
+            }
+            
+            if (type === 'bot' && sources && sources.length > 0) {
+                const uniqueSources = [...new Set(sources)];
+                html += `
+                    <div class="sources">
+                        <div class="sources-title">📚 منابع:</div>
+                        <ul>
+                            ${uniqueSources.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            div.innerHTML = html;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // Edit modal functions
+        function openEditModal(msgId, text) {
+            editingMessageId = msgId;
+            document.getElementById('editText').value = text;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingMessageId = null;
+        }
+
+        function submitEdit() {
+            const newText = document.getElementById('editText').value.trim();
+            if (!newText) return;
+
+            const msgDiv = document.getElementById(editingMessageId);
+            if (msgDiv) {
+                const contentDiv = msgDiv.querySelector('.message-content');
+                if (contentDiv) {
+                    contentDiv.textContent = newText;
+                }
+            }
+
+            closeModal();
+            document.getElementById('question').value = newText;
+            sendMsg();
+        }
+
+        // Initialize module tokens
+        async function initModuleTokens() {
+            if (!currentModule) return;
+            
+            try {
+                const config = moduleConfig[currentModule];
+                const res = await fetch(config.tokenEndpoint);
+                const data = await res.json();
+                maxToken = data.max_tokens || 10000;
+                updateTokenDisplay(data.remaining_tokens || maxToken);
+            } catch (e) {
+                console.log('Could not fetch token status');
+                maxToken = 10000;
+                updateTokenDisplay(10000);
+            }
+        }
+
+        // Global init
+        async function init() {
+            try {
+                const res = await fetch('/api/token/status');
+                const data = await res.json();
+                maxToken = data.max_tokens || 10000;
+                updateTokenDisplay(data.remaining_tokens || maxToken);
+            } catch (e) {
+                console.log('Could not fetch token status');
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

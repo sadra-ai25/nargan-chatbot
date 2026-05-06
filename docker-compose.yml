@@ -1,0 +1,68 @@
+# version: '3.8'
+
+# services:
+#   rag-api:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: nargan-rag-system
+#     ports:
+#       - "9005:9005"
+#     volumes:
+#       # Mount data directory for persistent storage
+#       - ./data:/app/data
+#       # Mount model path
+#       - /mnt/storage-1/home/sadra/AISadra/user-4/e5-embedding:/model
+#     environment:
+#       - MODEL_PATH=/model/e5-model
+#       - DATA_DIR=/app/data
+#       - INDEX_PATH=/app/data/vector.index
+#       - METADATA_PATH=/app/data/metadata.pkl
+#       - EMBEDDINGS_PATH=/app/data/final_embeddings.jsonl
+#       - API_KEY=sk-kFIVdGGKBeqL3Eb7nZ67CVBcNiuo5KEid6S8meSfNzcQPrsZ
+#       - LLM_URL=https://api.gapgpt.app/v1/chat/completions
+#       - LLM_MODEL=gapgpt-qwen-3.5
+#       - DEFAULT_K=10
+#       - EMBEDDING_BATCH_SIZE=32
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:9005/health"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 40s
+
+version: '3.8'
+
+services:
+  nargan-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nargan-ai-platform
+    ports:
+      - "9005:9005"
+    volumes:
+      # Excel data (existing)
+      - ./data/excel:/app/data/excel
+      
+      # Documents data (new)
+      - ./data/documents/faiss_index:/app/data/documents/faiss_index
+      - ./data/documents/raw:/app/data/documents/raw
+      
+      # E5 Model (shared)
+      - /mnt/storage-1/home/sadra/AISadra/user-4/e5-embedding/e5-model:/model/e5-model:ro
+      
+      # Static & Templates
+      - ./static:/app/static
+      - ./templates:/app/templates
+      
+      # Persistent token DB
+      - ./data/tokens.db:/app/data/tokens.db
+    environment:
+      - E5_MODEL_PATH=/model/e5-model
+      - API_KEY=sk-kFIVdGGKBeqL3Eb7nZ67CVBcNiuo5KEid6S8meSfNzcQPrsZ
+      - LLM_URL=https://api.gapgpt.app/v1/chat/completions
+      - LLM_MODEL=gapgpt-qwen-3.5
+      - DEFAULT_K=10
+    restart: unless-stopped
