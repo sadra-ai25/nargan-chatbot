@@ -1,33 +1,47 @@
+# Environment variables
+.env
+.venv/
+venv/
+env/
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-venv/
-env/
-.venv/
+*.egg
+*.egg-info/
+dist/
+build/
 
-# Data (keep structure, ignore large files)
-data/*.index
+# Data & Vector DB (فایل‌های حجیم و غیرمتنی)
+data/*.faiss
 data/*.pkl
-data/*.jsonl
-!data/.gitkeep
+data/*.db
+data/*.index
+data/final_embeddings.jsonl
+data/metadata.pkl
+vector.index
+final_embeddings.jsonl
 
-# Environment
-.env
-.env.local
+# Excel files (در صورت تمایل می‌توانید اکسل‌های نمونه را هم نگه دارید، اما بهتر است خاموش باشند)
+data/excel/*.xlsx
+data/excel/*.xls
+*.xlsx
+*.xls
 
-# IDE
+# IDE & OS specific files
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# OS
+*~
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-logs/
+# Gitignore itself
+.gitignore
+
+# Backup/Copy files (برای تمیز نگه داشتن پروژه)
+*.copy.*
+* copy.*
