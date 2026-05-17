@@ -91,21 +91,23 @@ docker compose up -d --build
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/rag/ask` | Ask a question against indexed documents |
-| `POST` | `/documents/upload` | Upload and index a text document |
-| `POST` | `/excel/upload` | Upload and index an Excel file |
-| `GET` | `/documents/list` | List all indexed documents |
-| `DELETE` | `/documents/{id}` | Remove a document from the index |
+| `GET` | `/` | Web UI (browser-based chat interface) |
+| `GET` | `/health` | Service health check |
+| `POST` | `/api/ask/documents` | Ask a question against indexed text/PDF documents |
+| `POST` | `/api/ask/excel` | Ask a question against indexed Excel data |
+| `GET` | `/api/token/status/documents` | Token balance for document queries |
+| `GET` | `/api/token/status/excel` | Token balance for Excel queries |
+| `POST` | `/api/documents/ask` | (Router) Document Q&A with response model |
+| `POST` | `/api/excel/ask` | (Router) Excel Q&A with response model |
 
-### Example: Ask a Question
+### Example: Ask About Documents
 
 ```bash
-curl -X POST http://localhost:8000/rag/ask \
+curl -X POST http://localhost:8000/api/ask/documents \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your_token" \
   -d '{
     "question": "What is the maximum pressure rating for valve V-101?",
-    "k": 10
+    "chat_id": "user123"
   }'
 ```
 
@@ -113,18 +115,21 @@ curl -X POST http://localhost:8000/rag/ask \
 
 ```json
 {
-  "answer": "Valve V-101 has a maximum pressure rating of 150 PSI according to the P&ID sheet dated 2024-03.",
-  "sources": ["P&ID_Sheet_3.xlsx", "Equipment_List.xlsx"],
-  "retrieved_chunks": 10
+  "answer": "Valve V-101 has a maximum pressure rating of 150 PSI according to the P&ID sheet.",
+  "tokens_used": 245,
+  "remaining_tokens": 9755
 }
 ```
 
-### Example: Upload Excel Document
+### Example: Ask About Excel Data
 
 ```bash
-curl -X POST http://localhost:8000/excel/upload \
-  -F "file=@/path/to/equipment_list.xlsx" \
-  -H "Authorization: Bearer your_token"
+curl -X POST http://localhost:8000/api/ask/excel \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "What are the flow rates for pump P-201?",
+    "chat_id": "user123"
+  }'
 ```
 
 ## Building the Index (CLI)
